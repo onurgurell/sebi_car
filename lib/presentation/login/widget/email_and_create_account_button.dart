@@ -26,7 +26,9 @@ class EmailAndCreatAccountButton extends StatelessWidget {
                   builder: (context) {
                     return Container(
                       child: Column(
-                        children: [],
+                        children: [
+                          Container(),
+                        ],
                       ),
                     );
                   },
