@@ -18,7 +18,9 @@ class CreateAccountButtonOrGoogle extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               BaseButton(
-                onTap: () {},
+                onTap: () {
+                  viewModel.signInWithGoogle(context);
+                },
                 title: 'Continue With Google',
                 icon: const Icon(Icons.email),
               ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sebi_car/extension/context_extension.dart';
 import 'package:sebi_car/presentation/login/widget/sign_in_text_field_area.dart';
-import 'package:sebi_car/presentation/login/widget/create_account_button.dart';
+import 'package:sebi_car/presentation/login/widget/create_account_button_or_google.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});

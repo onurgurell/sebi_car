@@ -23,7 +23,7 @@ Future<dynamic> signUpBottomSheet(BuildContext context) {
     if (value.isEmpty) {
       return 'Lütfen e-mail adresi giriniz.';
     }
-    if (!value.contains('@') || !value.contains('edu.tr')) {
+    if (!value.contains('@') || !value.endsWith('edu.tr')) {
       return 'Geçerli bir edu.tr e-mail adresi giriniz.';
     }
     return null;
@@ -58,7 +58,7 @@ Future<dynamic> signUpBottomSheet(BuildContext context) {
                     style: TextStyle(fontSize: 22),
                   ),
                   SizedBox(
-                    height: context.getDynmaicHeight(.3),
+                    height: context.getDynmaicHeight(.35),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -88,6 +88,7 @@ Future<dynamic> signUpBottomSheet(BuildContext context) {
                     onTap: () {
                       if (formKey.currentState!.validate()) {
                         viewModel.saveUserInfo();
+                        viewModel.saveAuthEmailAndPassword();
                         Navigator.of(context).pop();
                         viewModel.nameController.clear();
                         viewModel.emailController.clear();
@@ -98,7 +99,9 @@ Future<dynamic> signUpBottomSheet(BuildContext context) {
                   const CustomDivederArea(),
                   BaseButton(
                     title: 'Sign Up with Google',
-                    onTap: () {},
+                    onTap: () {
+                      viewModel.signUpWithGoogle(context);
+                    },
                   ),
                   const SizedBox(height: 12),
                 ],

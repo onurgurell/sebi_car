@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sebi_car/presentation/home/home_view.dart';
 import 'package:sebi_car/service/auth_service.dart';
+import 'package:sebi_car/ui_kit/error_or_success_dialog.dart';
 
 class LoginViewModel extends ChangeNotifier {
   final TextEditingController _nameController = TextEditingController();
@@ -29,12 +31,96 @@ class LoginViewModel extends ChangeNotifier {
   void saveUserInfo() async {
     _isLoading = true;
     notifyListeners();
-    _firebaseService.saveUserData(
-      _nameController,
-      _emailController,
-      _passwordController,
+    await _firebaseService.saveUserData(
+      _nameController.text.trim(),
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
     );
 
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void saveAuthEmailAndPassword() async {
+    _isLoading = true;
+    notifyListeners();
+
+    await _firebaseService.createEmailAndPssword(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void signInWithGoogle(BuildContext context) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _firebaseService.singInWithGoogle();
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeView(),
+        ),
+      );
+    } catch (e) {
+      showErrorDialog(e.toString(), context);
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void signUpWithGoogle(BuildContext context) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _firebaseService.signUpWithGoogle();
+      await showSuccsesDialog(
+          'Kayıt Başarılı bir şekilde gerçekleştirildi', context);
+      _isLoading = false;
+    } catch (e) {
+      await showErrorDialog(e.toString(), context);
+
+      return;
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void signInCheckEmailAndPassword(BuildContext context) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await _firebaseService
+        .signInWithEmailAndPassword(
+      _loginNameController.text.trim(),
+      _loginPasswordController.text.trim(),
+    )
+        .then(
+      (user) {
+        if (user != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomeView(),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Kullanıcı Girişi Başarısız'),
+            ),
+          );
+        }
+      },
+    );
     _isLoading = false;
     notifyListeners();
   }
