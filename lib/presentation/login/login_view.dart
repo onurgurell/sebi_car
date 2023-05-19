@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sebi_car/extension/context_extension.dart';
-import 'package:sebi_car/presentation/login/widget/custom_text_field_area.dart';
-import 'package:sebi_car/presentation/login/widget/email_and_create_account_button.dart';
+import 'package:sebi_car/presentation/login/widget/sign_in_text_field_area.dart';
+import 'package:sebi_car/presentation/login/widget/create_account_button.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -13,12 +13,14 @@ class LoginView extends StatelessWidget {
         title: const Text('Sebi Car'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: const Column(
-        children: [
-          _SignInWelcomeText(),
-          CustomTextFieldArea(),
-          EmailAndCreatAccountButton(),
-        ],
+      body: const SingleChildScrollView(
+        child: Column(
+          children: [
+            _SignInWelcomeText(),
+            SignInTextFieldArea(),
+            CreateAccountButtonOrGoogle(),
+          ],
+        ),
       ),
     );
   }

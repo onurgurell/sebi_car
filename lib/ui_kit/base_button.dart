@@ -6,9 +6,11 @@ class BaseButton extends StatelessWidget {
     super.key,
     required this.title,
     this.icon,
+    required this.onTap,
   });
   final String title;
   final Icon? icon;
+  final Function() onTap;
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -18,7 +20,7 @@ class BaseButton extends StatelessWidget {
           context.getDynmaicHeight(.05),
         ),
       ),
-      onPressed: () {},
+      onPressed: onTap,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
