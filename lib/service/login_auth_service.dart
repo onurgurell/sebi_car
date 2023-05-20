@@ -1,26 +1,53 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class FirebaseService {
+class LoginFirebaseService {
   List<DocumentSnapshot> documents = [];
 
   Future<void> saveUserData(
     String nameController,
     String emailController,
     String passwordController,
+    String userId,
   ) async {
     try {
+      print("save $userId");
+
       CollectionReference users =
           FirebaseFirestore.instance.collection('userInfo');
 
-      await users.doc().set({
+      await users.doc(userId).set({
         "name": nameController,
         "email": emailController,
         "password": passwordController,
       });
     } catch (e) {
-      print("Service Error ${e.toString()}");
+      throw e.toString();
+    }
+  }
+
+  Future<void> saveUserPassangerInfo(
+    String userId,
+    String fromWhere,
+    String toWhere,
+  ) async {
+    try {
+      print("passanger $userId");
+      await FirebaseFirestore.instance
+          .collection('userInfo')
+          .doc(userId)
+          .collection("passenger")
+          .add(
+        {
+          "fromWhere": fromWhere,
+          "toWhere": toWhere,
+        },
+      );
+    } catch (e) {
+      throw e.toString();
     }
   }
 
@@ -57,10 +84,10 @@ class FirebaseService {
         );
         return userCredential.user;
       } else {
-        throw Exception('Kullanıcı Bulunamadı');
+        throw ('Kullanıcı Bulunamadı');
       }
     } catch (e) {
-      throw Exception('Giriş Başarısız!!!');
+      throw ('Giriş Başarısız!!!');
     }
   }
 

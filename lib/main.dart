@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sebi_car/presentation/login/login_view.dart';
+import 'package:sebi_car/core/router/route_manager.dart';
 import 'package:sebi_car/view_model/login/login_view_model.dart';
 
 void main() async {
@@ -19,13 +19,13 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => LoginViewModel(),
       child: MaterialApp(
+        onGenerateRoute: RouterManager.generateRoute,
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const LoginView(),
       ),
     );
   }

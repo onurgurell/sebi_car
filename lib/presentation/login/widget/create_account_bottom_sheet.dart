@@ -87,8 +87,9 @@ Future<dynamic> signUpBottomSheet(BuildContext context) {
                     title: 'Sign Up',
                     onTap: () {
                       if (formKey.currentState!.validate()) {
+                        viewModel.createAuthEmailAndPassword();
                         viewModel.saveUserInfo();
-                        viewModel.saveAuthEmailAndPassword();
+
                         Navigator.of(context).pop();
                         viewModel.nameController.clear();
                         viewModel.emailController.clear();

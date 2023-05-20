@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sebi_car/presentation/home/home_view.dart';
-import 'package:sebi_car/service/auth_service.dart';
+import 'package:sebi_car/core/router/routes.dart';
+import 'package:sebi_car/service/login_auth_service.dart';
+import 'package:sebi_car/ui_kit/custom_snack_bar.dart';
 import 'package:sebi_car/ui_kit/error_or_success_dialog.dart';
 
 class LoginViewModel extends ChangeNotifier {
@@ -10,11 +12,17 @@ class LoginViewModel extends ChangeNotifier {
   final TextEditingController _loginNameController = TextEditingController();
   final TextEditingController _loginPasswordController =
       TextEditingController();
-  final FirebaseService _firebaseService = FirebaseService();
-
+  final LoginFirebaseService _firebaseService = LoginFirebaseService();
+  final TextEditingController _fromWhereController = TextEditingController();
+  final TextEditingController _toWhereController = TextEditingController();
   bool _isLoading = false;
   bool _isPasswordObscure = false;
+  DateTime _selectedDate = DateTime.now();
+  User? user = FirebaseAuth.instance.currentUser;
 
+  DateTime get selectedDate => _selectedDate;
+  TextEditingController get fromWhereController => _fromWhereController;
+  TextEditingController get toWhereController => _toWhereController;
   TextEditingController get nameController => _nameController;
   TextEditingController get emailController => _emailController;
   TextEditingController get passwordController => _passwordController;
@@ -22,6 +30,11 @@ class LoginViewModel extends ChangeNotifier {
   TextEditingController get loginPasswordController => _loginPasswordController;
   bool get isLoading => _isLoading;
   bool get isPasswordObscure => _isPasswordObscure;
+
+  void selectDate(DateTime date) {
+    _selectedDate = date;
+    notifyListeners();
+  }
 
   void changeObscureText() {
     _isPasswordObscure = !_isPasswordObscure;
@@ -31,17 +44,39 @@ class LoginViewModel extends ChangeNotifier {
   void saveUserInfo() async {
     _isLoading = true;
     notifyListeners();
-    await _firebaseService.saveUserData(
-      _nameController.text.trim(),
-      _emailController.text.trim(),
-      _passwordController.text.trim(),
-    );
+    if (user != null) {
+      await _firebaseService.saveUserData(
+        _nameController.text.trim(),
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+        user!.uid,
+      );
+    } else {
+      throw 'Kullanıcı kimliği bulunamadı.';
+    }
 
     _isLoading = false;
     notifyListeners();
   }
 
-  void saveAuthEmailAndPassword() async {
+  void saveUserPassangerInfo() async {
+    _isLoading = true;
+    notifyListeners();
+    if (user != null) {
+      _firebaseService.saveUserPassangerInfo(
+        user!.uid,
+        _fromWhereController.text,
+        _toWhereController.text,
+      );
+    } else {
+      throw 'Kullanıcı kimliği bulunamadı.';
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void createAuthEmailAndPassword() async {
     _isLoading = true;
     notifyListeners();
 
@@ -61,12 +96,8 @@ class LoginViewModel extends ChangeNotifier {
     try {
       await _firebaseService.singInWithGoogle();
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomeView(),
-        ),
-      );
+      Navigator.pushNamedAndRemoveUntil(
+          context, Routes.homePage, (Route<dynamic> route) => false);
     } catch (e) {
       showErrorDialog(e.toString(), context);
     }
@@ -75,18 +106,16 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void signUpWithGoogle(BuildContext context) async {
+  void signUpWithGoogle(BuildContext context) {
     _isLoading = true;
     notifyListeners();
 
     try {
-      await _firebaseService.signUpWithGoogle();
-      await showSuccsesDialog(
-          'Kayıt Başarılı bir şekilde gerçekleştirildi', context);
+      _firebaseService.signUpWithGoogle();
+      showSuccsesDialog('Kayıt Başarılı bir şekilde gerçekleştirildi', context);
       _isLoading = false;
     } catch (e) {
-      await showErrorDialog(e.toString(), context);
-
+      showErrorDialog(e.toString(), context);
       return;
     }
 
@@ -98,7 +127,7 @@ class LoginViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    await _firebaseService
+    _firebaseService
         .signInWithEmailAndPassword(
       _loginNameController.text.trim(),
       _loginPasswordController.text.trim(),
@@ -106,21 +135,22 @@ class LoginViewModel extends ChangeNotifier {
         .then(
       (user) {
         if (user != null) {
-          Navigator.push(
+          Navigator.pushNamedAndRemoveUntil(
             context,
-            MaterialPageRoute(
-              builder: (context) => const HomeView(),
-            ),
+            Routes.homePage,
+            (Route<dynamic> route) => false,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Kullanıcı Girişi Başarısız'),
-            ),
-          );
+          customSnackBar('Kullanıcı Girişi Başarısız!!!', context);
         }
       },
-    );
+    ).catchError((onError) {
+      customSnackBar('Giriş Başarısız!!!', context);
+    }).whenComplete(() {
+      _isLoading = false;
+      notifyListeners();
+    });
+
     _isLoading = false;
     notifyListeners();
   }
