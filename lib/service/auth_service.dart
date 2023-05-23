@@ -1,12 +1,12 @@
-import 'dart:math';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class LoginFirebaseService {
+class FirebaseService {
   List<DocumentSnapshot> documents = [];
-
+  List<DocumentSnapshot> driverDocuments = [];
   Future<void> saveUserData(
     String nameController,
     String emailController,
@@ -14,8 +14,6 @@ class LoginFirebaseService {
     String userId,
   ) async {
     try {
-      print("save $userId");
-
       CollectionReference users =
           FirebaseFirestore.instance.collection('userInfo');
 
@@ -29,24 +27,79 @@ class LoginFirebaseService {
     }
   }
 
-  Future<void> saveUserPassangerInfo(
+  Future<void> savePassangerInfo(
     String userId,
     String fromWhere,
     String toWhere,
+    DateTime selectedDate,
   ) async {
     try {
-      print("passanger $userId");
       await FirebaseFirestore.instance
           .collection('userInfo')
           .doc(userId)
           .collection("passenger")
-          .add(
+          .doc()
+          .set(
         {
           "fromWhere": fromWhere,
           "toWhere": toWhere,
+          "selectedDate": selectedDate,
         },
       );
     } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<void> saveDriverInfo(
+    String userId,
+    String displayName,
+    String forDriverfromWhere,
+    String forDrivertoWhere,
+    DateTime selectedCal,
+    DateTime selectedTime,
+    String price,
+  ) async {
+    try {
+      await FirebaseFirestore.instance.collection("driver").doc().set(
+        {
+          "fromWhere": forDriverfromWhere,
+          "toWhere": forDrivertoWhere,
+          "selectedCalender": DateTime(
+            selectedCal.year,
+            selectedCal.month,
+            selectedCal.day,
+          ),
+          "displayName": displayName,
+          "selectedTime": selectedTime,
+          "price": price,
+          "userId": userId,
+        },
+      );
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> searchTravel(
+    String searchFromWhere,
+    String searchToWhere,
+    DateTime selectedCal,
+  ) async {
+    try {
+      log("girdiiii");
+
+      final driverCollection = FirebaseFirestore.instance.collection('driver');
+
+      final snapshot = await driverCollection
+          .where("fromWhere", isEqualTo: searchFromWhere)
+          .where("toWhere", isEqualTo: searchToWhere)
+          .where("selectedCalender", isEqualTo: selectedCal)
+          .get();
+
+      return snapshot;
+    } catch (e) {
+      log("başarısızzz");
       throw e.toString();
     }
   }

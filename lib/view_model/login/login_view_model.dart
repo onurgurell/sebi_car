@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sebi_car/core/router/routes.dart';
-import 'package:sebi_car/service/login_auth_service.dart';
+import 'package:sebi_car/service/auth_service.dart';
 import 'package:sebi_car/ui_kit/custom_snack_bar.dart';
 import 'package:sebi_car/ui_kit/error_or_success_dialog.dart';
 
@@ -12,14 +12,25 @@ class LoginViewModel extends ChangeNotifier {
   final TextEditingController _loginNameController = TextEditingController();
   final TextEditingController _loginPasswordController =
       TextEditingController();
-  final LoginFirebaseService _firebaseService = LoginFirebaseService();
+  final FirebaseService _firebaseService = FirebaseService();
   final TextEditingController _fromWhereController = TextEditingController();
   final TextEditingController _toWhereController = TextEditingController();
+  final TextEditingController _forDriverFromWhere = TextEditingController();
+  final TextEditingController _forDriverToWhere = TextEditingController();
+  final TextEditingController _forDriverPrice = TextEditingController();
+  DateTime _driverSelectedCal = DateTime.now();
+  DateTime _driverSelectedTime = DateTime.now();
   bool _isLoading = false;
   bool _isPasswordObscure = false;
   DateTime _selectedDate = DateTime.now();
   User? user = FirebaseAuth.instance.currentUser;
+  List<Map<String, dynamic>> _searchResult = [];
 
+  DateTime get driverSelectedCal => _driverSelectedCal;
+  DateTime get driverSelectedTime => _driverSelectedTime;
+  TextEditingController get forDriverFromWhere => _forDriverFromWhere;
+  TextEditingController get forDriverToWhere => _forDriverToWhere;
+  TextEditingController get forDriverPrice => _forDriverPrice;
   DateTime get selectedDate => _selectedDate;
   TextEditingController get fromWhereController => _fromWhereController;
   TextEditingController get toWhereController => _toWhereController;
@@ -30,6 +41,17 @@ class LoginViewModel extends ChangeNotifier {
   TextEditingController get loginPasswordController => _loginPasswordController;
   bool get isLoading => _isLoading;
   bool get isPasswordObscure => _isPasswordObscure;
+  List<Map<String, dynamic>> get searchResult => _searchResult;
+
+  void driverSelectedCalender(DateTime date) {
+    _driverSelectedCal = date;
+    notifyListeners();
+  }
+
+  void driverSelectedChooseTime(DateTime time) {
+    _driverSelectedTime = time;
+    notifyListeners();
+  }
 
   void selectDate(DateTime date) {
     _selectedDate = date;
@@ -59,14 +81,15 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void saveUserPassangerInfo() async {
+  Future<void> savePassangerInfo() async {
     _isLoading = true;
     notifyListeners();
     if (user != null) {
-      _firebaseService.saveUserPassangerInfo(
+      _firebaseService.savePassangerInfo(
         user!.uid,
         _fromWhereController.text,
         _toWhereController.text,
+        _selectedDate,
       );
     } else {
       throw 'Kullanıcı kimliği bulunamadı.';
@@ -74,6 +97,56 @@ class LoginViewModel extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  void saveDriverInfo() async {
+    notifyListeners();
+    if (user != null) {
+      _firebaseService.saveDriverInfo(
+        user!.uid,
+        user!.displayName.toString(),
+        _forDriverFromWhere.text,
+        _forDriverToWhere.text,
+        _driverSelectedCal,
+        _driverSelectedTime,
+        _forDriverPrice.text,
+      );
+    } else {
+      throw 'Kullanıcı kimliği bulunamadı.';
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> searchDrivers() async {
+    try {
+      final searchResultList = await _firebaseService.searchTravel(
+        _fromWhereController.text.trim(),
+        _toWhereController.text.trim(),
+        _selectedDate,
+      );
+
+      final documents = searchResultList;
+
+      for (final document in documents.docs) {
+        final driverToWhere = document['toWhere'];
+        final driverFromWhere = document['fromWhere'];
+        final price = document['price'];
+        final driverSelectedCal = document['selectedCalender'];
+
+        _searchResult.add({
+          'toWhere': driverToWhere,
+          'fromWhere': driverFromWhere,
+          'price': price,
+          'selectedCalender': driverSelectedCal,
+        });
+      }
+
+      print("search result: $_searchResult");
+      notifyListeners();
+    } catch (e) {
+      throw "sonuç başarısız!!!!! ${e.toString()}";
+    }
   }
 
   void createAuthEmailAndPassword() async {

@@ -3,9 +3,14 @@ import 'package:sebi_car/extension/context_extension.dart';
 import 'package:sebi_car/presentation/login/widget/sign_in_text_field_area.dart';
 import 'package:sebi_car/presentation/login/widget/create_account_button_or_google.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

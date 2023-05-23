@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:sebi_car/core/router/routes.dart';
 import 'package:sebi_car/extension/context_extension.dart';
 import 'package:sebi_car/presentation/home/widgets/search_text_field.dart';
-import 'package:sebi_car/view_model/home/home_view_model.dart';
+import 'package:sebi_car/presentation/search_result/search_result.dart';
 import 'package:sebi_car/view_model/login/login_view_model.dart';
 
 class SearchArea extends StatelessWidget {
@@ -62,12 +63,16 @@ class SearchArea extends StatelessWidget {
                           },
                         );
                       },
-                      child: const Icon(Icons.calendar_month),
+                      child: const Icon(
+                        Icons.calendar_month,
+                        size: 32,
+                      ),
                     ),
                     Container(
-                      width: MediaQuery.of(context).size.width * .2,
-                      height: 25,
+                      width: MediaQuery.of(context).size.width * .25,
+                      height: 40,
                       decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(22),
                         border: Border.all(
                           color: Colors.black,
                         ),
@@ -80,8 +85,16 @@ class SearchArea extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         fixedSize: Size(context.getDynmaicWidth(.6), 1),
                       ),
-                      onPressed: () {
-                        viewModel.saveUserPassangerInfo();
+                      onPressed: () async {
+                        //   viewModel.savePassangerInfo();
+                        await viewModel.searchDrivers();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SearchResult(),
+                            )).then((value) {
+                          viewModel.searchResult.clear();
+                        });
                       },
                       child: const Text('Ara'),
                     ),

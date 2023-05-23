@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sebi_car/extension/context_extension.dart';
 import 'package:sebi_car/presentation/login/widget/custom_base_text_field.dart';
-import 'package:sebi_car/presentation/login/widget/custom_divider.dart';
+import 'package:sebi_car/ui_kit/custom_divider.dart';
 import 'package:sebi_car/ui_kit/base_button.dart';
 import 'package:sebi_car/view_model/login/login_view_model.dart';
 
@@ -88,9 +88,9 @@ Future<dynamic> signUpBottomSheet(BuildContext context) {
                     onTap: () {
                       if (formKey.currentState!.validate()) {
                         viewModel.createAuthEmailAndPassword();
+                        Navigator.of(context).pop();
                         viewModel.saveUserInfo();
 
-                        Navigator.of(context).pop();
                         viewModel.nameController.clear();
                         viewModel.emailController.clear();
                         viewModel.passwordController.clear();

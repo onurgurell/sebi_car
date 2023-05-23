@@ -5,19 +5,19 @@
 	<key>CLIENT_ID</key>
 	<string>729808881767-eim3gbrd5jhv4p8vd3r1hoaufpeo5k29.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.729808881767-eim3gbrd5jhv4p8vd3r1hoaufpeo5k29</string>
+	<string>com.googleusercontent.apps.593574149771-49bta19t07b5drjb192h5l83glklr4ps</string>
 	<key>API_KEY</key>
-	<string>AIzaSyClcX6SeS2XesdaX_uWnXXGLsW19sRtTOY</string>
+	<string>AIzaSyCUOWpAE21N-Z7HqJQMy-lUjsz77-U_gXE</string>
 	<key>GCM_SENDER_ID</key>
-	<string>729808881767</string>
+	<string>593574149771</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.example.sebiCar</string>
 	<key>PROJECT_ID</key>
-	<string>sebi-car</string>
+	<string>sebi-car-f0201</string>
 	<key>STORAGE_BUCKET</key>
-	<string>sebi-car.appspot.com</string>
+	<string>sebi-car-f0201.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:729808881767:ios:ec222b2851e57a41dcacc2</string>
+	<string>1:593574149771:ios:9856d8e6f12fa0315a1e8e</string>
 </dict>
 </plist>
