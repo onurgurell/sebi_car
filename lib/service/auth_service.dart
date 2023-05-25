@@ -1,13 +1,30 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sebi_car/model/user_model.dart';
 
 class FirebaseService {
   List<DocumentSnapshot> documents = [];
   List<DocumentSnapshot> driverDocuments = [];
-  Future<void> saveUserData(
+
+  Future<UserModel> getUserData(String userId) async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection("userInfo")
+          .doc(userId)
+          .get();
+      if (snapshot.exists) {
+        UserModel userData = UserModel.fromSnapshot(snapshot);
+        return userData;
+      } else {
+        throw "Kullanıcı verisi bulunamadı.";
+      }
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<void> authSaveUserData(
     String nameController,
     String emailController,
     String passwordController,
@@ -21,13 +38,14 @@ class FirebaseService {
         "name": nameController,
         "email": emailController,
         "password": passwordController,
+        "userId": userId
       });
     } catch (e) {
       throw e.toString();
     }
   }
 
-  Future<void> savePassangerInfo(
+  Future<void> authSavePassangerInfo(
     String userId,
     String fromWhere,
     String toWhere,
@@ -51,18 +69,18 @@ class FirebaseService {
     }
   }
 
-  Future<void> saveDriverInfo(
-    String userId,
-    String displayName,
+  Future<void> authSaveDriverInfo(
+    String name,
     String forDriverfromWhere,
     String forDrivertoWhere,
     DateTime selectedCal,
-    DateTime selectedTime,
+    String selectedTime,
     String price,
   ) async {
     try {
       await FirebaseFirestore.instance.collection("driver").doc().set(
         {
+          "name": name,
           "fromWhere": forDriverfromWhere,
           "toWhere": forDrivertoWhere,
           "selectedCalender": DateTime(
@@ -70,10 +88,8 @@ class FirebaseService {
             selectedCal.month,
             selectedCal.day,
           ),
-          "displayName": displayName,
           "selectedTime": selectedTime,
           "price": price,
-          "userId": userId,
         },
       );
     } catch (e) {
@@ -81,14 +97,12 @@ class FirebaseService {
     }
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> searchTravel(
+  Future<QuerySnapshot<Map<String, dynamic>>> authSearchTravel(
     String searchFromWhere,
     String searchToWhere,
     DateTime selectedCal,
   ) async {
     try {
-      log("girdiiii");
-
       final driverCollection = FirebaseFirestore.instance.collection('driver');
 
       final snapshot = await driverCollection
@@ -96,15 +110,13 @@ class FirebaseService {
           .where("toWhere", isEqualTo: searchToWhere)
           .where("selectedCalender", isEqualTo: selectedCal)
           .get();
-
       return snapshot;
     } catch (e) {
-      log("başarısızzz");
       throw e.toString();
     }
   }
 
-  Future<User?> createEmailAndPssword(String email, String password) async {
+  Future<User?> authCreateEmailAndPssword(String email, String password) async {
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -118,7 +130,7 @@ class FirebaseService {
     }
   }
 
-  Future<User?> signInWithEmailAndPassword(
+  Future<User?> authSignInWithEmailAndPassword(
       String email, String password) async {
     try {
       CollectionReference users =
@@ -144,7 +156,7 @@ class FirebaseService {
     }
   }
 
-  Future<UserCredential> singInWithGoogle() async {
+  Future<UserCredential> authSignInWithGoogle() async {
     final GoogleSignInAccount? googleSignInAccount =
         await GoogleSignIn().signIn();
 
@@ -167,7 +179,7 @@ class FirebaseService {
     }
   }
 
-  Future<void> signUpWithGoogle() async {
+  Future<void> authSignUpWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     if (googleUser != null) {
@@ -193,12 +205,12 @@ class FirebaseService {
             'email': userCredential.user!.email,
           });
         }
-        throw ('Kayıt Başarılı Bir Şekilde Gerçekleştirildi');
+        throw 'Kayıt Başarılı Bir Şekilde Gerçekleştirildi';
       } else {
-        throw ('Lütfen Okul Mailiniz İle Giriş Yapınız');
+        throw 'Lütfen Okul Mailiniz İle Giriş Yapınız';
       }
     } else {
-      throw ('Giriş Başarılı olamadı');
+      throw 'Giriş Başarılı olamadı';
     }
   }
 }

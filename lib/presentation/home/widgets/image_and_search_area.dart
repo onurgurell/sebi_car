@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sebi_car/core/constants/app_image_paths.dart';
 import 'package:sebi_car/extension/context_extension.dart';
-import 'package:sebi_car/presentation/home/widgets/search_area.dart';
+import 'package:sebi_car/presentation/home/widgets/home_search_area.dart';
 
 class HomeImageAndSearch extends StatelessWidget {
   const HomeImageAndSearch({
@@ -13,7 +13,7 @@ class HomeImageAndSearch extends StatelessWidget {
     return const Stack(
       children: [
         _ImageArea(),
-        SearchArea(),
+        HomeSearchArea(),
       ],
     );
   }

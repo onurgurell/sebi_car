@@ -1,6 +1,6 @@
 class Routes {
-  static const homePage = "/";
-  static const login = "/login";
+  static const homePage = "/homePage";
+  static const login = "/";
   static const journeyCreation = "/journeyCreation";
-  static const searchResultPage = "/searchResultPage";
+  static const searchPage = "/searchPage";
 }

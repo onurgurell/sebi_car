@@ -3,8 +3,8 @@ import 'package:sebi_car/core/router/routes.dart';
 import 'package:sebi_car/ui_kit/custom_divider.dart';
 import 'package:sebi_car/ui_kit/base_button.dart';
 
-class DriverArea extends StatelessWidget {
-  const DriverArea({
+class HomeDriverArea extends StatelessWidget {
+  const HomeDriverArea({
     super.key,
   });
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sebi_car/extension/context_extension.dart';
 
-class SearchBaseTextField extends StatelessWidget {
-  const SearchBaseTextField({
+class HomeSearchBaseTextField extends StatelessWidget {
+  const HomeSearchBaseTextField({
     super.key,
     required this.hintText,
     required this.controller,

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sebi_car/extension/context_extension.dart';
-import 'package:sebi_car/presentation/driver_info/widget/base_container_for_driver_info.dart';
-import 'package:sebi_car/presentation/driver_info/widget/base_select_time_or_calender.dart';
-import 'package:sebi_car/view_model/login/login_view_model.dart';
+import 'package:sebi_car/presentation/journey_creation/widget/base_container_for_driver_info.dart';
+import 'package:sebi_car/presentation/journey_creation/widget/base_select_time_or_calender.dart';
+import 'package:sebi_car/view_model/home/journey_cretaion_view_model.dart';
 
 class JourneyCreationView extends StatelessWidget {
   const JourneyCreationView({super.key});
@@ -26,7 +26,7 @@ class JourneyCreationView extends StatelessWidget {
           ),
         ],
       ),
-      body: Consumer<LoginViewModel>(
+      body: Consumer<JourneyCreationViewModel>(
         builder: (context, viewModel, _) {
           final formattedDate = DateFormat('dd/MM/yy')
               .format(viewModel.driverSelectedCal)
@@ -60,7 +60,7 @@ class JourneyCreationView extends StatelessWidget {
                   const SizedBox(height: 26),
                   BaseSelectTimeOrCalender(
                     icon: Icons.calendar_month,
-                    title: "Gideceğiniz Tarih?",
+                    title: "Gideceğiniz Saat?",
                     selectTime: formattedDate.toString(),
                     onTap: () {
                       showDatePicker(
@@ -82,18 +82,18 @@ class JourneyCreationView extends StatelessWidget {
                     icon: Icons.alarm,
                     title: "Gideceğiniz Tarih?",
                     selectTime:
-                        TimeOfDay.fromDateTime(viewModel.driverSelectedTime)
-                            .format(context),
+                        viewModel.formatTime(viewModel.driverSelectedTime),
                     onTap: () {
                       showTimePicker(
-                              context: context, initialTime: TimeOfDay.now())
-                          .then(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      ).then(
                         (selectedTime) {
                           if (selectedTime != null) {
                             final selectedDateTime = DateTime(
-                              viewModel.driverSelectedTime.year,
-                              viewModel.driverSelectedTime.month,
-                              viewModel.driverSelectedTime.day,
+                              DateTime.now().year,
+                              DateTime.now().month,
+                              DateTime.now().day,
                               selectedTime.hour,
                               selectedTime.minute,
                             );
@@ -112,14 +112,14 @@ class JourneyCreationView extends StatelessWidget {
                         context.getDynmaicHeight(.05),
                       ),
                     ),
-                    onPressed: () {
-                      viewModel.saveDriverInfo();
+                    onPressed: () async {
+                      await viewModel.saveDriverInfo();
                       Navigator.pop(context);
                       viewModel.forDriverFromWhere.clear();
                       viewModel.forDriverToWhere.clear();
                       viewModel.forDriverPrice.clear();
                     },
-                    child: Text("Yolculuğu Oluştur"),
+                    child: const Text("Yolculuğu Oluştur"),
                   )
                 ],
               ),

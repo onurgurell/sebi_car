@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sebi_car/presentation/home/widgets/driver_area.dart';
+import 'package:sebi_car/presentation/home/widgets/home_driver_area.dart';
 import 'package:sebi_car/presentation/home/widgets/home_text.dart';
 import 'package:sebi_car/presentation/home/widgets/image_and_search_area.dart';
 
@@ -19,7 +19,7 @@ class HomeView extends StatelessWidget {
             HomeText(),
             HomeImageAndSearch(),
             SizedBox(height: 22),
-            DriverArea(),
+            HomeDriverArea(),
           ],
         ),
       ),

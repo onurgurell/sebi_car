@@ -1,11 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sebi_car/core/router/routes.dart';
 import 'package:sebi_car/service/auth_service.dart';
 import 'package:sebi_car/ui_kit/custom_snack_bar.dart';
 import 'package:sebi_car/ui_kit/error_or_success_dialog.dart';
+import 'package:sebi_car/view_model/base_view_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LoginViewModel extends ChangeNotifier {
+class LoginViewModel extends BaseViewModel {
+  LoginViewModel() {
+    init();
+  }
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -13,27 +17,12 @@ class LoginViewModel extends ChangeNotifier {
   final TextEditingController _loginPasswordController =
       TextEditingController();
   final FirebaseService _firebaseService = FirebaseService();
-  final TextEditingController _fromWhereController = TextEditingController();
-  final TextEditingController _toWhereController = TextEditingController();
-  final TextEditingController _forDriverFromWhere = TextEditingController();
-  final TextEditingController _forDriverToWhere = TextEditingController();
-  final TextEditingController _forDriverPrice = TextEditingController();
-  DateTime _driverSelectedCal = DateTime.now();
-  DateTime _driverSelectedTime = DateTime.now();
+
   bool _isLoading = false;
   bool _isPasswordObscure = false;
-  DateTime _selectedDate = DateTime.now();
-  User? user = FirebaseAuth.instance.currentUser;
-  List<Map<String, dynamic>> _searchResult = [];
 
-  DateTime get driverSelectedCal => _driverSelectedCal;
-  DateTime get driverSelectedTime => _driverSelectedTime;
-  TextEditingController get forDriverFromWhere => _forDriverFromWhere;
-  TextEditingController get forDriverToWhere => _forDriverToWhere;
-  TextEditingController get forDriverPrice => _forDriverPrice;
-  DateTime get selectedDate => _selectedDate;
-  TextEditingController get fromWhereController => _fromWhereController;
-  TextEditingController get toWhereController => _toWhereController;
+  late SharedPreferences sharedPreferences;
+
   TextEditingController get nameController => _nameController;
   TextEditingController get emailController => _emailController;
   TextEditingController get passwordController => _passwordController;
@@ -41,21 +30,9 @@ class LoginViewModel extends ChangeNotifier {
   TextEditingController get loginPasswordController => _loginPasswordController;
   bool get isLoading => _isLoading;
   bool get isPasswordObscure => _isPasswordObscure;
-  List<Map<String, dynamic>> get searchResult => _searchResult;
 
-  void driverSelectedCalender(DateTime date) {
-    _driverSelectedCal = date;
-    notifyListeners();
-  }
-
-  void driverSelectedChooseTime(DateTime time) {
-    _driverSelectedTime = time;
-    notifyListeners();
-  }
-
-  void selectDate(DateTime date) {
-    _selectedDate = date;
-    notifyListeners();
+  init() async {
+    sharedPreferences = await SharedPreferences.getInstance();
   }
 
   void changeObscureText() {
@@ -67,7 +44,7 @@ class LoginViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     if (user != null) {
-      await _firebaseService.saveUserData(
+      await _firebaseService.authSaveUserData(
         _nameController.text.trim(),
         _emailController.text.trim(),
         _passwordController.text.trim(),
@@ -76,84 +53,17 @@ class LoginViewModel extends ChangeNotifier {
     } else {
       throw 'Kullanıcı kimliği bulunamadı.';
     }
+    await sharedPreferences.setString('userId', user!.uid);
 
     _isLoading = false;
     notifyListeners();
-  }
-
-  Future<void> savePassangerInfo() async {
-    _isLoading = true;
-    notifyListeners();
-    if (user != null) {
-      _firebaseService.savePassangerInfo(
-        user!.uid,
-        _fromWhereController.text,
-        _toWhereController.text,
-        _selectedDate,
-      );
-    } else {
-      throw 'Kullanıcı kimliği bulunamadı.';
-    }
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  void saveDriverInfo() async {
-    notifyListeners();
-    if (user != null) {
-      _firebaseService.saveDriverInfo(
-        user!.uid,
-        user!.displayName.toString(),
-        _forDriverFromWhere.text,
-        _forDriverToWhere.text,
-        _driverSelectedCal,
-        _driverSelectedTime,
-        _forDriverPrice.text,
-      );
-    } else {
-      throw 'Kullanıcı kimliği bulunamadı.';
-    }
-
-    notifyListeners();
-  }
-
-  Future<void> searchDrivers() async {
-    try {
-      final searchResultList = await _firebaseService.searchTravel(
-        _fromWhereController.text.trim(),
-        _toWhereController.text.trim(),
-        _selectedDate,
-      );
-
-      final documents = searchResultList;
-
-      for (final document in documents.docs) {
-        final driverToWhere = document['toWhere'];
-        final driverFromWhere = document['fromWhere'];
-        final price = document['price'];
-        final driverSelectedCal = document['selectedCalender'];
-
-        _searchResult.add({
-          'toWhere': driverToWhere,
-          'fromWhere': driverFromWhere,
-          'price': price,
-          'selectedCalender': driverSelectedCal,
-        });
-      }
-
-      print("search result: $_searchResult");
-      notifyListeners();
-    } catch (e) {
-      throw "sonuç başarısız!!!!! ${e.toString()}";
-    }
   }
 
   void createAuthEmailAndPassword() async {
     _isLoading = true;
     notifyListeners();
 
-    await _firebaseService.createEmailAndPssword(
+    await _firebaseService.authCreateEmailAndPssword(
       _emailController.text.trim(),
       _passwordController.text.trim(),
     );
@@ -162,12 +72,12 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void signInWithGoogle(BuildContext context) async {
+  Future<void> signInWithGoogle(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      await _firebaseService.singInWithGoogle();
+      await _firebaseService.authSignInWithGoogle();
 
       Navigator.pushNamedAndRemoveUntil(
           context, Routes.homePage, (Route<dynamic> route) => false);
@@ -184,9 +94,7 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _firebaseService.signUpWithGoogle();
-      showSuccsesDialog('Kayıt Başarılı bir şekilde gerçekleştirildi', context);
-      _isLoading = false;
+      _firebaseService.authSignUpWithGoogle();
     } catch (e) {
       showErrorDialog(e.toString(), context);
       return;
@@ -201,7 +109,7 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
 
     _firebaseService
-        .signInWithEmailAndPassword(
+        .authSignInWithEmailAndPassword(
       _loginNameController.text.trim(),
       _loginPasswordController.text.trim(),
     )

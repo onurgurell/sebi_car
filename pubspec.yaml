@@ -40,6 +40,8 @@ dependencies:
   google_sign_in: ^6.1.0
   #date
   intl: ^0.18.1
+  #cached
+  shared_preferences: ^2.1.1
 
   
   
