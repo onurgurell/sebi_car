@@ -33,8 +33,8 @@ Future<dynamic> signUpBottomSheet(BuildContext context) {
     if (value.isEmpty) {
       return 'Lütfen şifre giriniz.';
     }
-    if (value.length < 3) {
-      return 'Şifre 3 karakterden daha uzun olmalıdır.';
+    if (value.length <= 5) {
+      return 'Şifre 5 karakterden daha uzun olmalıdır.';
     }
     return null;
   }
@@ -85,9 +85,9 @@ Future<dynamic> signUpBottomSheet(BuildContext context) {
                   ),
                   BaseButton(
                     title: 'Sign Up',
-                    onTap: () {
+                    onTap: () async {
                       if (formKey.currentState!.validate()) {
-                        viewModel.createAuthEmailAndPassword();
+                        viewModel.createAuthEmailAndPassword(context);
                         Navigator.of(context).pop();
                         viewModel.saveUserInfo();
 

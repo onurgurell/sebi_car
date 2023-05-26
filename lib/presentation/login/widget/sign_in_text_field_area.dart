@@ -9,16 +9,6 @@ import 'package:sebi_car/view_model/login/login_view_model.dart';
 class SignInTextFieldArea extends StatelessWidget {
   const SignInTextFieldArea({super.key});
 
-  String? validatePassword(String value) {
-    if (value.isEmpty) {
-      return 'Lütfen şifre giriniz.';
-    }
-    if (value.length < 3) {
-      return 'Şifre 3 karakterden daha uzun olmalıdır.';
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(

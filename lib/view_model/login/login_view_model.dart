@@ -59,7 +59,7 @@ class LoginViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  void createAuthEmailAndPassword() async {
+  Future<void> createAuthEmailAndPassword(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
@@ -82,21 +82,23 @@ class LoginViewModel extends BaseViewModel {
       Navigator.pushNamedAndRemoveUntil(
           context, Routes.homePage, (Route<dynamic> route) => false);
     } catch (e) {
-      showErrorDialog(e.toString(), context);
+      showSuccessOrErrorDialog('Error', e.toString(), context);
     }
 
     _isLoading = false;
     notifyListeners();
   }
 
-  void signUpWithGoogle(BuildContext context) {
+  Future<void> signUpWithGoogle(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      _firebaseService.authSignUpWithGoogle();
+      await _firebaseService.authSignUpWithGoogle();
+      showSuccessOrErrorDialog(
+          'Başarılı', 'Kayıt Başarılı Şekilde Oluşturuldu', context);
     } catch (e) {
-      showErrorDialog(e.toString(), context);
+      showSuccessOrErrorDialog('Error', e.toString(), context);
       return;
     }
 
@@ -127,9 +129,6 @@ class LoginViewModel extends BaseViewModel {
       },
     ).catchError((onError) {
       customSnackBar('Giriş Başarısız!!!', context);
-    }).whenComplete(() {
-      _isLoading = false;
-      notifyListeners();
     });
 
     _isLoading = false;

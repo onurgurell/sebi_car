@@ -205,7 +205,6 @@ class FirebaseService {
             'email': userCredential.user!.email,
           });
         }
-        throw 'Kayıt Başarılı Bir Şekilde Gerçekleştirildi';
       } else {
         throw 'Lütfen Okul Mailiniz İle Giriş Yapınız';
       }
