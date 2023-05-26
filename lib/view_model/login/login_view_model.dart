@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sebi_car/core/router/routes.dart';
 import 'package:sebi_car/service/auth_service.dart';
@@ -59,14 +60,26 @@ class LoginViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  Future<void> createAuthEmailAndPassword(BuildContext context) async {
+  Future<void> createEmailAndPassword() async {
     _isLoading = true;
     notifyListeners();
 
-    await _firebaseService.authCreateEmailAndPssword(
-      _emailController.text.trim(),
-      _passwordController.text.trim(),
-    );
+    try {
+      await _firebaseService.authCreateEmailAndPassword(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+    } catch (e) {
+      if (e is FirebaseAuthException) {
+        if (e.code == 'email-already-in-use') {
+          throw 'Bu Email Mevcut';
+        } else {
+          throw 'Hata Oluştu';
+        }
+      } else {
+        throw 'Kayıt Başarısız';
+      }
+    }
 
     _isLoading = false;
     notifyListeners();
@@ -106,7 +119,7 @@ class LoginViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  void signInCheckEmailAndPassword(BuildContext context) async {
+  Future<void> signInCheckEmailAndPassword(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
@@ -123,12 +136,10 @@ class LoginViewModel extends BaseViewModel {
             Routes.homePage,
             (Route<dynamic> route) => false,
           );
-        } else {
-          customSnackBar('Kullanıcı Girişi Başarısız!!!', context);
-        }
+        } else {}
       },
-    ).catchError((onError) {
-      customSnackBar('Giriş Başarısız!!!', context);
+    ).catchError((e) {
+      customSnackBar(e.toString(), context);
     });
 
     _isLoading = false;

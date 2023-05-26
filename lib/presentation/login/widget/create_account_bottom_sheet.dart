@@ -4,6 +4,7 @@ import 'package:sebi_car/extension/context_extension.dart';
 import 'package:sebi_car/presentation/login/widget/custom_base_text_field.dart';
 import 'package:sebi_car/ui_kit/custom_divider.dart';
 import 'package:sebi_car/ui_kit/base_button.dart';
+import 'package:sebi_car/ui_kit/error_or_success_dialog.dart';
 import 'package:sebi_car/view_model/login/login_view_model.dart';
 
 Future<dynamic> signUpBottomSheet(BuildContext context) {
@@ -87,13 +88,27 @@ Future<dynamic> signUpBottomSheet(BuildContext context) {
                     title: 'Sign Up',
                     onTap: () async {
                       if (formKey.currentState!.validate()) {
-                        viewModel.createAuthEmailAndPassword(context);
-                        Navigator.of(context).pop();
-                        viewModel.saveUserInfo();
+                        try {
+                          viewModel.saveUserInfo();
 
-                        viewModel.nameController.clear();
-                        viewModel.emailController.clear();
-                        viewModel.passwordController.clear();
+                          await viewModel.createEmailAndPassword();
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              backgroundColor: Colors.purple,
+                              content: Text('Doğrulama kodu gönderildi'),
+                            ),
+                          );
+
+                          Navigator.of(context).pop();
+
+                          viewModel.nameController.clear();
+                          viewModel.emailController.clear();
+                          viewModel.passwordController.clear();
+                        } catch (e) {
+                          showSuccessOrErrorDialog(
+                              'Error', e.toString(), context);
+                        }
                       }
                     },
                   ),

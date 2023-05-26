@@ -116,18 +116,19 @@ class FirebaseService {
     }
   }
 
-  Future<User?> authCreateEmailAndPssword(String email, String password) async {
-    try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+  Future<User?> authCreateEmailAndPassword(
+      String email, String password) async {
+    UserCredential userCredential =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
 
-      return userCredential.user;
-    } catch (e) {
-      throw Exception('Kullanıcı Oluşturma Başarısız');
+    if (userCredential.user != null) {
+      await userCredential.user!.sendEmailVerification();
     }
+
+    return userCredential.user;
   }
 
   Future<User?> authSignInWithEmailAndPassword(
@@ -147,7 +148,12 @@ class FirebaseService {
           email: email,
           password: password,
         );
-        return userCredential.user;
+
+        if (userCredential.user!.emailVerified) {
+          return userCredential.user;
+        } else {
+          throw ('E-posta doğrulanmamış');
+        }
       } else {
         throw ('Kullanıcı Bulunamadı');
       }
