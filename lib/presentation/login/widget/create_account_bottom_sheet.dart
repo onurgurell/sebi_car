@@ -113,12 +113,14 @@ Future<dynamic> signUpBottomSheet(BuildContext context) {
                     },
                   ),
                   const CustomDivederArea(),
-                  BaseButton(
-                    title: 'Sign Up with Google',
-                    onTap: () {
-                      viewModel.signUpWithGoogle(context);
-                    },
-                  ),
+                  viewModel.isLoading
+                      ? const CircularProgressIndicator()
+                      : BaseButton(
+                          title: 'Sign Up with Google',
+                          onTap: () {
+                            viewModel.signUpWithGoogle(context);
+                          },
+                        ),
                   const SizedBox(height: 12),
                 ],
               ),

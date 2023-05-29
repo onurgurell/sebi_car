@@ -17,13 +17,15 @@ class CreateAccountButtonOrGoogle extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              BaseButton(
-                onTap: () {
-                  viewModel.signInWithGoogle(context);
-                },
-                title: 'Continue With Google',
-                icon: const Icon(Icons.email),
-              ),
+              viewModel.isLoading
+                  ? const CircularProgressIndicator()
+                  : BaseButton(
+                      onTap: () {
+                        viewModel.signInWithGoogle(context);
+                      },
+                      title: 'Continue With Google',
+                      icon: const Icon(Icons.email),
+                    ),
               const SizedBox(height: 22),
               Container(
                 alignment: Alignment.bottomCenter,

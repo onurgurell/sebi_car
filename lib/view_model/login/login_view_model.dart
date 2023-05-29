@@ -36,14 +36,17 @@ class LoginViewModel extends BaseViewModel {
     sharedPreferences = await SharedPreferences.getInstance();
   }
 
+  void loadingFunc() {
+    _isLoading = !_isLoading;
+    notifyListeners();
+  }
+
   void changeObscureText() {
     _isPasswordObscure = !_isPasswordObscure;
     notifyListeners();
   }
 
   void saveUserInfo() async {
-    _isLoading = true;
-    notifyListeners();
     if (user != null) {
       await _firebaseService.authSaveUserData(
         _nameController.text.trim(),
@@ -55,15 +58,9 @@ class LoginViewModel extends BaseViewModel {
       throw 'Kullanıcı kimliği bulunamadı.';
     }
     await sharedPreferences.setString('userId', user!.uid);
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   Future<void> createEmailAndPassword() async {
-    _isLoading = true;
-    notifyListeners();
-
     try {
       await _firebaseService.authCreateEmailAndPassword(
         _emailController.text.trim(),
@@ -80,14 +77,10 @@ class LoginViewModel extends BaseViewModel {
         throw 'Kayıt Başarısız';
       }
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   Future<void> signInWithGoogle(BuildContext context) async {
-    _isLoading = true;
-    notifyListeners();
+    loadingFunc();
 
     try {
       await _firebaseService.authSignInWithGoogle();
@@ -98,13 +91,12 @@ class LoginViewModel extends BaseViewModel {
       showSuccessOrErrorDialog('Error', e.toString(), context);
     }
 
-    _isLoading = false;
-    notifyListeners();
+    loadingFunc();
+    return;
   }
 
   Future<void> signUpWithGoogle(BuildContext context) async {
-    _isLoading = true;
-    notifyListeners();
+    loadingFunc();
 
     try {
       await _firebaseService.authSignUpWithGoogle();
@@ -112,17 +104,16 @@ class LoginViewModel extends BaseViewModel {
           'Başarılı', 'Kayıt Başarılı Şekilde Oluşturuldu', context);
     } catch (e) {
       showSuccessOrErrorDialog('Error', e.toString(), context);
+      loadingFunc();
+
       return;
     }
 
-    _isLoading = false;
-    notifyListeners();
+    loadingFunc();
+    return;
   }
 
   Future<void> signInCheckEmailAndPassword(BuildContext context) async {
-    _isLoading = true;
-    notifyListeners();
-
     _firebaseService
         .authSignInWithEmailAndPassword(
       _loginNameController.text.trim(),
@@ -143,8 +134,5 @@ class LoginViewModel extends BaseViewModel {
     ).catchError((e) {
       customSnackBar(e.toString(), context);
     });
-
-    _isLoading = false;
-    notifyListeners();
   }
 }
