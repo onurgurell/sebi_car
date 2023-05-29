@@ -32,8 +32,8 @@ class SignInTextFieldArea extends StatelessWidget {
               const SizedBox(height: 18),
               BaseButton(
                 title: 'Sign In',
-                onTap: () {
-                  viewModel.signInCheckEmailAndPassword(context);
+                onTap: () async {
+                  await viewModel.signInCheckEmailAndPassword(context);
                 },
               ),
               const SizedBox(height: 22),

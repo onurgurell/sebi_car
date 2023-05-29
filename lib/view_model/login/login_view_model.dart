@@ -136,7 +136,9 @@ class LoginViewModel extends BaseViewModel {
             Routes.homePage,
             (Route<dynamic> route) => false,
           );
-        } else {}
+        } else {
+          customSnackBar('Kullanıcı Girişi Başarısız!!!', context);
+        }
       },
     ).catchError((e) {
       customSnackBar(e.toString(), context);
