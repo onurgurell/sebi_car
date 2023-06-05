@@ -13,6 +13,7 @@ class FirebaseService {
           .collection("userInfo")
           .doc(userId)
           .get();
+
       if (snapshot.exists) {
         UserModel userData = UserModel.fromSnapshot(snapshot);
         return userData;

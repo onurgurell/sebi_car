@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:sebi_car/core/local/shared_prefs.dart';
 import 'package:sebi_car/core/router/routes.dart';
 import 'package:sebi_car/service/auth_service.dart';
 import 'package:sebi_car/ui_kit/custom_snack_bar.dart';
@@ -8,9 +9,7 @@ import 'package:sebi_car/view_model/base_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginViewModel extends BaseViewModel {
-  LoginViewModel() {
-    init();
-  }
+  LoginViewModel() {}
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -22,7 +21,7 @@ class LoginViewModel extends BaseViewModel {
   bool _isLoading = false;
   bool _isPasswordObscure = false;
 
-  late SharedPreferences sharedPreferences;
+  final SharedPrefs pref = SharedPrefs();
 
   TextEditingController get nameController => _nameController;
   TextEditingController get emailController => _emailController;
@@ -31,10 +30,6 @@ class LoginViewModel extends BaseViewModel {
   TextEditingController get loginPasswordController => _loginPasswordController;
   bool get isLoading => _isLoading;
   bool get isPasswordObscure => _isPasswordObscure;
-
-  init() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-  }
 
   void loadingFunc() {
     _isLoading = !_isLoading;
@@ -57,7 +52,8 @@ class LoginViewModel extends BaseViewModel {
     } else {
       throw 'Kullanıcı kimliği bulunamadı.';
     }
-    await sharedPreferences.setString('userId', user!.uid);
+
+    await pref.save("userId", user!.uid);
   }
 
   Future<void> createEmailAndPassword() async {

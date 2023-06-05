@@ -1,30 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:sebi_car/core/local/shared_prefs.dart';
 import 'package:sebi_car/model/user_model.dart';
 import 'package:sebi_car/service/auth_service.dart';
 import 'package:sebi_car/view_model/base_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class JourneyCreationViewModel extends BaseViewModel {
-  JourneyCreationViewModel() {
-    init();
-  }
+  JourneyCreationViewModel() {}
   final TextEditingController _forDriverFromWhere = TextEditingController();
   final TextEditingController _forDriverToWhere = TextEditingController();
   final TextEditingController _forDriverPrice = TextEditingController();
   DateTime _driverSelectedCal = DateTime.now();
   TimeOfDay _driverSelectedTime = TimeOfDay.now();
   final FirebaseService _firebaseService = FirebaseService();
-  late SharedPreferences sharedPreferences;
+  final SharedPrefs pref = SharedPrefs();
 
   DateTime get driverSelectedCal => _driverSelectedCal;
   TimeOfDay get driverSelectedTime => _driverSelectedTime;
   TextEditingController get forDriverFromWhere => _forDriverFromWhere;
   TextEditingController get forDriverToWhere => _forDriverToWhere;
   TextEditingController get forDriverPrice => _forDriverPrice;
-
-  init() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-  }
 
   void driverSelectedCalender(DateTime date) {
     _driverSelectedCal = date;
@@ -39,7 +34,8 @@ class JourneyCreationViewModel extends BaseViewModel {
 
   Future<void> saveDriverInfo() async {
     if (user != null) {
-      String? cachedUserId = sharedPreferences.getString('userId');
+      String? cachedUserId = await pref.read("userId");
+      print("saveDriver $cachedUserId");
       UserModel userData = await _firebaseService.getUserData(cachedUserId!);
       final userName = userData.name;
 

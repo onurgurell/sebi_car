@@ -1,29 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:sebi_car/core/local/shared_prefs.dart';
 import 'package:sebi_car/service/auth_service.dart';
 import 'package:sebi_car/view_model/base_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchAreaViewModel extends BaseViewModel {
-  SearchAreaViewModel() {
-    init();
-  }
   final TextEditingController _fromWhereController = TextEditingController();
   final TextEditingController _toWhereController = TextEditingController();
   final FirebaseService _firebaseService = FirebaseService();
   final List<Map<String, dynamic>> _searchResult = [];
-  late SharedPreferences sharedPreferences;
   DateTime _selectedDate = DateTime.now();
   bool _isLoading = false;
+  final SharedPrefs _sharedPrefs = SharedPrefs();
 
   bool get isLoading => _isLoading;
   DateTime get selectedDate => _selectedDate;
   TextEditingController get fromWhereController => _fromWhereController;
   TextEditingController get toWhereController => _toWhereController;
   List<Map<String, dynamic>> get searchResult => _searchResult;
-
-  init() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-  }
 
   void selectDate(DateTime date) {
     _selectedDate = date;
@@ -34,7 +28,7 @@ class SearchAreaViewModel extends BaseViewModel {
     _isLoading = true;
     notifyListeners();
     if (user != null) {
-      String? cachedUserId = sharedPreferences.getString('userId');
+      String? cachedUserId = await _sharedPrefs.read("userId");
       _firebaseService.authSavePassangerInfo(
         cachedUserId!,
         _fromWhereController.text,
